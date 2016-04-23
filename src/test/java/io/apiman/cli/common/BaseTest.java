@@ -17,11 +17,13 @@
 package io.apiman.cli.common;
 
 import com.google.common.base.Strings;
+import com.google.common.io.BaseEncoding;
+import com.jayway.restassured.RestAssured;
 import io.apiman.cli.Cli;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 
 import static io.apiman.cli.util.Functions.not;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -30,6 +32,27 @@ import static java.util.Optional.ofNullable;
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
 public class BaseTest {
+    /**
+     * Basic auth header.
+     */
+    protected static final String HEADER_AUTHORIZATION = "Authorization";
+
+    /**
+     * Management API username.
+     */
+    protected static final String APIMAN_USERNAME = "admin";
+
+    /**
+     * Management API password.
+     */
+    protected static final String APIMAN_PASSWORD = "admin123!";
+
+    /**
+     * Encoded credentials for Basic auth.
+     */
+    protected static final String BASIC_AUTH_VALUE = "Basic " + BaseEncoding.base64().encode(
+            (APIMAN_USERNAME + ":" + APIMAN_PASSWORD).getBytes());
+
     /**
      * Wait for apiman to be available.
      */
@@ -49,7 +72,12 @@ public class BaseTest {
                 .orElse(8080);
     }
 
-    public static String getApimanUrl() {
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        RestAssured.baseURI = getApimanUrl();
+    }
+
+    protected static String getApimanUrl() {
         return apiman.getAddress() + "/apiman";
     }
 
@@ -62,8 +90,8 @@ public class BaseTest {
         Cli.main("org", "create",
                 "--debug",
                 "--server", getApimanUrl(),
-                "--serverUsername", "admin",
-                "--serverPassword", "admin123!",
+                "--serverUsername", APIMAN_USERNAME,
+                "--serverPassword", APIMAN_PASSWORD,
                 "--name", orgName,
                 "--description", "example");
     }
