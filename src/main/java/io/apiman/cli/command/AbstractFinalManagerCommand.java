@@ -14,28 +14,34 @@
  * limitations under the License.
  */
 
-package io.apiman.cli.core.plugin.command;
+package io.apiman.cli.command;
 
-import io.apiman.cli.command.AbstractManagerCommand;
-import io.apiman.cli.command.Command;
+import org.kohsuke.args4j.CmdLineParser;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * Root Command for managing plugins.
+ * A Command that has no child Commands.
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public class PluginCommand extends AbstractManagerCommand {
+public abstract class AbstractFinalManagerCommand extends AbstractManagerCommand {
+
+    /**
+     * Indicates that there is no child command and that this instance should handle the request.
+     *
+     * @param args
+     * @param parser
+     * @return <code>null</code>
+     */
     @Override
-    protected void populateCommands(Map<String, Class<? extends Command>> commandMap) {
-        commandMap.put("add", PluginAddCommand.class);
-        commandMap.put("show", PluginShowCommand.class);
-        commandMap.put("list", PluginListCommand.class);
+    protected Command getChildAction(List<String> args, CmdLineParser parser) {
+        return null;
     }
 
     @Override
-    protected String getCommandDescription() {
-        return "Manage Plugins";
+    protected void populateCommands(Map<String, Class<? extends Command>> commandMap) {
+        // no child commands
     }
 }

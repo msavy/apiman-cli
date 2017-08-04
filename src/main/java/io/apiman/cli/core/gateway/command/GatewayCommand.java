@@ -16,7 +16,7 @@
 
 package io.apiman.cli.core.gateway.command;
 
-import io.apiman.cli.command.AbstractCommand;
+import io.apiman.cli.command.AbstractManagerCommand;
 import io.apiman.cli.command.Command;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public class GatewayCommand extends AbstractCommand {
+public class GatewayCommand extends AbstractManagerCommand {
     @Override
     protected void populateCommands(Map<String, Class<? extends Command>> commandMap) {
         commandMap.put("create", GatewayCreateCommand.class);

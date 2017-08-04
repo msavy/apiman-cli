@@ -16,8 +16,6 @@
 
 package io.apiman.cli.command;
 
-import static io.apiman.cli.util.AuthUtil.DEFAULT_SERVER_PASSWORD;
-import static io.apiman.cli.util.AuthUtil.DEFAULT_SERVER_USERNAME;
 import static io.apiman.cli.util.LogUtil.LINE_SEPARATOR;
 
 import io.apiman.cli.core.common.model.ManagementApiVersion;
@@ -44,7 +42,6 @@ import com.google.inject.Injector;
  */
 public abstract class AbstractCommand implements Command {
     private static final Logger LOGGER = LogManager.getLogger(AbstractCommand.class);
-    private static final String DEFAULT_SERVER_ADDRESS = "http://localhost:8080/apiman";
 
     /**
      * Maps commands (e.g. 'org' or 'create') to their implementations.
@@ -56,15 +53,6 @@ public abstract class AbstractCommand implements Command {
 
     @Option(name = "--help", aliases = {"-h"}, usage = "Display usage only", help = true)
     private boolean displayHelp;
-
-    @Option(name = "--server", aliases = {"-s"}, usage = "Management API server address")
-    protected String serverAddress = DEFAULT_SERVER_ADDRESS;
-
-    @Option(name = "--serverUsername", aliases = {"-su"}, usage = "Management API server username")
-    private String serverUsername = DEFAULT_SERVER_USERNAME;
-
-    @Option(name = "--serverPassword", aliases = {"-sp"}, usage = "Management API server password")
-    private String serverPassword = DEFAULT_SERVER_PASSWORD;
 
     /**
      * The parent Command (<code>null</code> if root).
@@ -278,46 +266,6 @@ public abstract class AbstractCommand implements Command {
             }
         }
         return null;
-    }
-
-    /**
-     * @param clazz the Class for which to build a client
-     * @param <T>   the API interface
-     * @return an API client for the given Class
-     */
-    protected <T> T buildServerApiClient(Class<T> clazz) {
-        return buildServerApiClient(clazz, ManagementApiVersion.UNSPECIFIED);
-    }
-
-    /**
-     * @param clazz         the Class for which to build a client
-     * @param serverVersion the server version
-     * @param <T>           the API interface
-     * @return an API client for the given Class
-     */
-    protected <T> T buildServerApiClient(Class<T> clazz, ManagementApiVersion serverVersion) {
-        return ManagementApiUtil.buildServerApiClient(
-                clazz,
-                getManagementApiEndpoint(),
-                getManagementApiUsername(),
-                getManagementApiPassword(),
-                logDebug,
-                serverVersion);
-    }
-
-    protected String getManagementApiEndpoint() {
-        // TODO consider reading from config file/environment
-        return serverAddress;
-    }
-
-    private String getManagementApiUsername() {
-        // TODO consider reading from config file/environment
-        return serverUsername;
-    }
-
-    private String getManagementApiPassword() {
-        // TODO consider reading from config file/environment
-        return serverPassword;
     }
 
     public void setLogDebug(boolean logDebug) {

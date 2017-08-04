@@ -26,7 +26,8 @@ import java.util.Map;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public abstract class AbstractFinalCommand extends AbstractCommand {
+public abstract class AbstractFinalGatewayCommand extends AbstractGatewayCommand {
+
     /**
      * Indicates that there is no child command and that this instance should handle the request.
      *

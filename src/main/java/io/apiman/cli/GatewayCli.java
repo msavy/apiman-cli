@@ -16,7 +16,8 @@
 
 package io.apiman.cli;
 
-import io.apiman.cli.command.AbstractCommand;
+import io.apiman.cli.command.AbstractGatewayCommand;
+import io.apiman.cli.command.AbstractManagerCommand;
 import io.apiman.cli.command.Command;
 import io.apiman.cli.core.declarative.command.GatewayApplyCommand;
 
@@ -29,7 +30,7 @@ import com.google.common.collect.Lists;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public class GatewayCli extends AbstractCommand {
+public class GatewayCli extends AbstractGatewayCommand {
     public static void main(String... args) {
         new GatewayCli().run(Lists.newArrayList(args));
     }
