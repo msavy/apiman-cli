@@ -30,6 +30,8 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Create an API.
@@ -58,7 +60,7 @@ public class ApiCreateCommand extends AbstractApiCommand implements ApiMixin {
     private boolean publicApi;
 
     @Option(name = "--gateway", aliases = {"-g"}, usage = "Gateway")
-    private String gateway = "TheGateway";
+    private List<String> gateway = new ArrayList<String>();
 
     @Override
     protected String getCommandDescription() {
@@ -74,11 +76,16 @@ public class ApiCreateCommand extends AbstractApiCommand implements ApiMixin {
                 description,
                 initialVersion);
 
+        if (gateway.size()==0) { gateway.add("TheGateway"); }
+        // populating the list of Gateway
+        final List<ApiGateway> gatewaysList = Lists.newArrayList();
+        gateway.forEach(strGat -> { gatewaysList.add(new ApiGateway(strGat)); });
+
         final ApiConfig config = new ApiConfig(
                 endpoint,
                 endpointType,
                 publicApi,
-                Lists.newArrayList(new ApiGateway(gateway)));
+                gatewaysList);
 
         // create
         final VersionAgnosticApi apiClient = buildServerApiClient(VersionAgnosticApi.class, serverVersion);
