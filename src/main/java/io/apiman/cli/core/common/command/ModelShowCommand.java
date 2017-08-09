@@ -29,7 +29,7 @@ import java.text.MessageFormat;
 /**
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public abstract class ModelShowCommand<M, A> extends AbstractModelCommand<M, A> {
+public abstract class ModelShowCommand<M, A> extends AbstractManagerModelCommand<M, A> {
     private static final Logger LOGGER = LogManager.getLogger(ModelShowCommand.class);
 
     @Override

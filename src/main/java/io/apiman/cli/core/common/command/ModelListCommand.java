@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public abstract class ModelListCommand<M, A> extends AbstractModelCommand<M, A> {
+public abstract class ModelListCommand<M, A> extends AbstractManagerModelCommand<M, A> {
     private static final Logger LOGGER = LogManager.getLogger(ModelListCommand.class);
 
     @Override

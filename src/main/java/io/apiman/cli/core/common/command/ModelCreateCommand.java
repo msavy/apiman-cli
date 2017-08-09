@@ -30,7 +30,7 @@ import java.text.MessageFormat;
 /**
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public abstract class ModelCreateCommand<M, A> extends AbstractModelCommand<M, A> {
+public abstract class ModelCreateCommand<M, A> extends AbstractManagerModelCommand<M, A> {
     private static final Logger LOGGER = LogManager.getLogger(ModelCreateCommand.class);
 
     @Override

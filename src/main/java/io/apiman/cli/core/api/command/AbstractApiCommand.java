@@ -16,8 +16,7 @@
 
 package io.apiman.cli.core.api.command;
 
-import io.apiman.cli.command.ManagerMixin;
-import io.apiman.cli.core.common.command.AbstractModelCommand;
+import io.apiman.cli.core.common.command.AbstractManagerModelCommand;
 import io.apiman.cli.core.api.Version12xServerApi;
 import io.apiman.cli.core.api.ApiMixin;
 import io.apiman.cli.core.api.model.Api;
@@ -29,7 +28,7 @@ import org.kohsuke.args4j.Option;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public abstract class AbstractApiCommand extends AbstractModelCommand<Api, Version12xServerApi>
+public abstract class AbstractApiCommand extends AbstractManagerModelCommand<Api, Version12xServerApi>
         implements ApiMixin {
     @Option(name = "--orgName", aliases = {"-o"}, usage = "Organisation name", required = true)
     protected String orgName;
