@@ -21,6 +21,7 @@ import io.apiman.cli.core.api.ApiMixin;
 import io.apiman.cli.core.api.model.Api;
 import io.apiman.cli.core.api.model.ApiConfig;
 import io.apiman.cli.core.api.model.ApiGateway;
+import io.apiman.cli.core.api.model.ApiPlan;
 import io.apiman.cli.core.api.VersionAgnosticApi;
 import io.apiman.cli.exception.CommandException;
 import io.apiman.cli.management.ManagementApiUtil;
@@ -85,7 +86,8 @@ public class ApiCreateCommand extends AbstractApiCommand implements ApiMixin {
                 endpoint,
                 endpointType,
                 publicApi,
-                gatewaysList);
+                gatewaysList,
+                new ArrayList<ApiPlan>());
 
         // create
         final VersionAgnosticApi apiClient = buildServerApiClient(VersionAgnosticApi.class, serverVersion);
