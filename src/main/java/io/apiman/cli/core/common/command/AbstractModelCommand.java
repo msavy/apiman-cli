@@ -17,6 +17,7 @@
 package io.apiman.cli.core.common.command;
 
 import io.apiman.cli.command.AbstractFinalCommand;
+import io.apiman.cli.command.ManagerMixin;
 
 /**
  * Common model CRUD functionality.
@@ -24,5 +25,5 @@ import io.apiman.cli.command.AbstractFinalCommand;
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
 public abstract class AbstractModelCommand<M, A> extends AbstractFinalCommand
-        implements ModelAction<M, A> {
+        implements ModelAction<M, A>, ManagerMixin {
 }

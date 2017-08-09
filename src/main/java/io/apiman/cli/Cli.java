@@ -17,7 +17,6 @@
 package io.apiman.cli;
 
 import io.apiman.cli.command.AbstractCommand;
-import io.apiman.cli.command.AbstractManagerCommand;
 import io.apiman.cli.command.Command;
 
 import java.util.Map;

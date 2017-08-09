@@ -16,7 +16,7 @@
 
 package io.apiman.cli.core.plugin.command;
 
-import io.apiman.cli.command.AbstractManagerCommand;
+import io.apiman.cli.command.AbstractCommand;
 import io.apiman.cli.command.Command;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public class PluginCommand extends AbstractManagerCommand {
+public class PluginCommand extends AbstractCommand {
     @Override
     protected void populateCommands(Map<String, Class<? extends Command>> commandMap) {
         commandMap.put("add", PluginAddCommand.class);

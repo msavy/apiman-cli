@@ -17,6 +17,7 @@
 package io.apiman.cli.core.api.command;
 
 import com.google.common.collect.Lists;
+import io.apiman.cli.command.ManagerMixin;
 import io.apiman.cli.core.api.ApiMixin;
 import io.apiman.cli.core.api.model.Api;
 import io.apiman.cli.core.api.model.ApiConfig;

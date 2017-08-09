@@ -19,6 +19,7 @@ package io.apiman.cli.core.declarative.command;
 import static io.apiman.cli.util.Functions.of;
 import static java.util.Optional.ofNullable;
 
+import io.apiman.cli.command.ManagerMixin;
 import io.apiman.cli.core.api.VersionAgnosticApi;
 import io.apiman.cli.core.api.model.Api;
 import io.apiman.cli.core.api.model.ApiConfig;
@@ -59,7 +60,7 @@ import com.google.common.io.CharStreams;
 
 import retrofit.mime.TypedString;
 
-public class ManagerApplyCommand extends AbstractApplyCommand {
+public class ManagerApplyCommand extends AbstractApplyCommand implements ManagerMixin {
     private static final String STATE_READY = "READY";
     private static final String STATE_PUBLISHED = "PUBLISHED";
     private static final String STATE_RETIRED = "RETIRED";

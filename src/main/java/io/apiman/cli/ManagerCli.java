@@ -16,7 +16,7 @@
 
 package io.apiman.cli;
 
-import io.apiman.cli.command.AbstractManagerCommand;
+import io.apiman.cli.command.AbstractCommand;
 import io.apiman.cli.command.Command;
 import io.apiman.cli.core.api.command.ApiCommand;
 import io.apiman.cli.core.declarative.command.ManagerApplyCommand;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
 
-public class ManagerCli extends AbstractManagerCommand {
+public class ManagerCli extends AbstractCommand {
 
     @Override
     protected void populateCommands(Map<String, Class<? extends Command>> commandMap) {

@@ -18,7 +18,8 @@ package io.apiman.cli.core.declarative.command;
 
 import static java.util.Optional.ofNullable;
 
-import io.apiman.cli.command.Command;
+import io.apiman.cli.command.AbstractCommand;
+import io.apiman.cli.command.AbstractFinalCommand;
 import io.apiman.cli.core.declarative.model.BaseDeclaration;
 import io.apiman.cli.exception.CommandException;
 import io.apiman.cli.util.BeanUtil;
@@ -44,7 +45,7 @@ import org.kohsuke.args4j.Option;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public abstract class AbstractApplyCommand implements Command {
+public abstract class AbstractApplyCommand extends AbstractFinalCommand {
     private static final Logger LOGGER = LogManager.getLogger(AbstractApplyCommand.class);
     protected static final String JSON_EXTENSION = ".json";
 
@@ -127,9 +128,5 @@ public abstract class AbstractApplyCommand implements Command {
 
     public void setPropertiesFiles(List<Path> propertiesFiles) {
         this.propertiesFiles = propertiesFiles;
-    }
-
-    public void setServerAddress(String serverAddress) {
-        this.serverAddress = serverAddress;
     }
 }

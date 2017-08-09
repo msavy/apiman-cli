@@ -42,28 +42,24 @@ import com.google.inject.Injector;
 /**
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-public abstract class AbstractManagerCommand extends AbstractCommand {
-    private static final String DEFAULT_SERVER_ADDRESS = "http://localhost:8080/apiman";
+public interface ManagerMixin {
+    String DEFAULT_SERVER_ADDRESS = "http://localhost:8080/apiman";
 
     @Option(name = "--server", aliases = {"-s"}, usage = "Management API server address")
-    protected String serverAddress = DEFAULT_SERVER_ADDRESS;
+    String serverAddress = DEFAULT_SERVER_ADDRESS;
 
     @Option(name = "--serverUsername", aliases = {"-su"}, usage = "Management API server username")
-    private String serverUsername = DEFAULT_SERVER_USERNAME;
+    String serverUsername = DEFAULT_SERVER_USERNAME;
 
     @Option(name = "--serverPassword", aliases = {"-sp"}, usage = "Management API server password")
-    private String serverPassword = DEFAULT_SERVER_PASSWORD;
-
-    public AbstractManagerCommand() {
-        super();
-    }
+    String serverPassword = DEFAULT_SERVER_PASSWORD;
 
     /**
      * @param clazz the Class for which to build a client
      * @param <T>   the API interface
      * @return an API client for the given Class
      */
-    protected <T> T buildServerApiClient(Class<T> clazz) {
+    default <T> T buildServerApiClient(Class<T> clazz) {
         return buildServerApiClient(clazz, ManagementApiVersion.UNSPECIFIED);
     }
 
@@ -73,7 +69,7 @@ public abstract class AbstractManagerCommand extends AbstractCommand {
      * @param <T>           the API interface
      * @return an API client for the given Class
      */
-    protected <T> T buildServerApiClient(Class<T> clazz, ManagementApiVersion serverVersion) {
+    default <T> T buildServerApiClient(Class<T> clazz, ManagementApiVersion serverVersion) {
         return ManagementApiUtil.buildServerApiClient(
                 clazz,
                 getManagementApiEndpoint(),
@@ -83,19 +79,21 @@ public abstract class AbstractManagerCommand extends AbstractCommand {
                 serverVersion);
     }
 
-    protected String getManagementApiEndpoint() {
+    default String getManagementApiEndpoint() {
         // TODO consider reading from config file/environment
         return serverAddress;
     }
 
-    private String getManagementApiUsername() {
+    default String getManagementApiUsername() {
         // TODO consider reading from config file/environment
         return serverUsername;
     }
 
-    private String getManagementApiPassword() {
+    default String getManagementApiPassword() {
         // TODO consider reading from config file/environment
         return serverPassword;
     }
+
+    boolean getLogDebug();
 
 }

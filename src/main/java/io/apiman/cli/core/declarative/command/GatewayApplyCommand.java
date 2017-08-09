@@ -20,6 +20,8 @@ import static java.text.MessageFormat.format;
 import static java.util.Optional.ofNullable;
 
 import com.google.inject.Inject;
+import io.apiman.cli.command.AbstractFinalCommand;
+import io.apiman.cli.command.GatewayMixin;
 import io.apiman.cli.core.api.GatewayApi;
 import io.apiman.cli.core.api.model.ApiGateway;
 import io.apiman.cli.core.api.model.EndpointProperties;
@@ -63,7 +65,8 @@ import retrofit.RetrofitError;
  *
  * @author Marc Savy {@literal <marc@rhymewithgravy.com>}
  */
-public class GatewayApplyCommand extends AbstractApplyCommand {
+public class GatewayApplyCommand extends AbstractApplyCommand
+        implements GatewayMixin {
 
     private static final Logger LOGGER = LogManager.getLogger(GatewayApplyCommand.class);
     private String orgId;
