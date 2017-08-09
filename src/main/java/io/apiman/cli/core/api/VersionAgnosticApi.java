@@ -35,7 +35,9 @@ public interface VersionAgnosticApi {
     Api fetch(String orgName, String apiName);
 
     Api fetchVersion(String orgName, String apiName, String version);
-
+    
+    List<Api> fetchVersions(String orgName, String apiName);
+    
     Response configure(String orgName, String apiName,
                        String version, ApiConfig config);
 

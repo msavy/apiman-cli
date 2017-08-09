@@ -63,6 +63,11 @@ public class Version11XManagementApiFactoryImpl extends AbstractManagementApiFac
             public Api fetchVersion(String orgName, String apiName, String version) {
                 return delegate.fetchVersion(orgName, apiName, version);
             }
+            
+            @Override
+            public List<Api> fetchVersions(String orgName, String apiName) {
+                return delegate.fetchVersions(orgName, apiName);
+            }
 
             @Override
             public Response configure(String orgName, String apiName, String version, ApiConfig apiConfig) {
