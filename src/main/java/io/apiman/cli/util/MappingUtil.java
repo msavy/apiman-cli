@@ -27,7 +27,9 @@ import io.apiman.cli.core.gateway.model.Gateway;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -179,6 +181,14 @@ public class MappingUtil {
             final ApiConfig apiConfig = context.getDestination();
             apiConfig.setPublicApi(declarativeApiConfig.isMakePublic());
             apiConfig.setGateways(Lists.newArrayList(new ApiGateway(declarativeApiConfig.getGateway())));
+
+            // Gateways management
+            final String strGateway = declarativeApiConfig.getGateway();
+            final StringTokenizer st = new StringTokenizer(strGateway);
+            final ArrayList<ApiGateway> gatewaysList = Lists.newArrayList();
+            while (st.hasMoreTokens()) gatewaysList.add(new ApiGateway(st.nextToken()));
+            apiConfig.setGateways(gatewaysList);
+
 
             return apiConfig;
         });
