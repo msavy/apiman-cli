@@ -35,7 +35,9 @@ public interface VersionAgnosticApi {
     Api fetch(String orgName, String apiName);
 
     Api fetchVersion(String orgName, String apiName, String version);
-
+    
+    List<Api> fetchVersions(String orgName, String apiName);
+    
     Response configure(String orgName, String apiName,
                        String version, ApiConfig config);
 
@@ -47,6 +49,9 @@ public interface VersionAgnosticApi {
 
     List<ApiPolicy> fetchPolicies(String orgName, String serviceName,
                                   String version);
+    
+    ApiPolicy fetchPolicy(String orgName, String apiName,
+    					String version, Long policyId);
 
     Response configurePolicy(String orgName, String apiName,
                              String apiVersion, Long policyId, ApiPolicy policyConfig);

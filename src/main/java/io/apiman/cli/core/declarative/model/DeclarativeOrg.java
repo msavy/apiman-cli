@@ -33,6 +33,10 @@ import java.util.List;
 public class DeclarativeOrg extends Org {
     @JsonProperty
     private List<DeclarativeApi> apis;
+    
+
+    @JsonProperty
+    private List<DeclarativePlan> plans;
 
     public List<DeclarativeApi> getApis() {
         return apis;
@@ -40,5 +44,13 @@ public class DeclarativeOrg extends Org {
 
     public void setApis(List<DeclarativeApi> apis) {
         this.apis = apis;
+    }
+
+    public List<DeclarativePlan> getPlans() {
+        return plans;
+    }
+
+    public void setPlans(List<DeclarativePlan> plans) {
+        this.plans = plans;
     }
 }

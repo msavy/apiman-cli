@@ -30,13 +30,18 @@ import io.apiman.cli.core.common.model.ManagementApiVersion;
 import io.apiman.cli.core.common.util.ServerActionUtil;
 import io.apiman.cli.core.declarative.model.BaseDeclaration;
 import io.apiman.cli.core.declarative.model.DeclarativeApi;
+import io.apiman.cli.core.declarative.model.DeclarativePlan;
 import io.apiman.cli.core.gateway.GatewayApi;
 import io.apiman.cli.core.gateway.model.Gateway;
 import io.apiman.cli.core.org.OrgApi;
 import io.apiman.cli.core.org.model.Org;
+import io.apiman.cli.core.plan.PlanApi;
+import io.apiman.cli.core.plan.model.Plan;
+import io.apiman.cli.core.plan.model.PlanVersion;
 import io.apiman.cli.core.plugin.PluginApi;
 import io.apiman.cli.core.plugin.model.Plugin;
 import io.apiman.cli.exception.DeclarativeException;
+import io.apiman.cli.management.ManagementApiUtil;
 import io.apiman.cli.util.BeanUtil;
 import io.apiman.cli.util.DeclarativeUtil;
 import io.apiman.cli.util.MappingUtil;
@@ -99,6 +104,10 @@ public class ManagerApplyCommand extends AbstractApplyCommand {
 
             // add apis
             applyApis(declaration, orgName);
+            
+
+            // add plan
+            applyPlans(buildServerApiClient(PlanApi.class), declaration, orgName);
         });
 
         LOGGER.info("Applied declaration");
@@ -209,6 +218,114 @@ public class ManagerApplyCommand extends AbstractApplyCommand {
         });
     }
 
+    /**
+     * Add and configure Plans if they are not present.
+     *
+     * @param declaration the Declaration to apply.
+     * @param orgName
+     */
+    private void applyPlans(PlanApi planClient, BaseDeclaration declaration, String orgName) {
+        ofNullable(declaration.getOrg().getPlans()).ifPresent(declarativePlans -> {
+            LOGGER.debug("Applying Plans");
+            declarativePlans.forEach(declarativePlan ->  {
+
+                of(DeclarativeUtil.checkExists(() -> planClient.fetch(orgName, declarativePlan.getName())))
+                        .ifPresent(existing -> {
+                            LOGGER.info("Plan already exists: {}",  declarativePlan.getName());
+                            // create and configure Plan version
+                            applyPlanVersion(planClient, declarativePlan, orgName, declarativePlan.getName(), declarativePlan.getVersion());
+                        })
+                        .ifNotPresent(() -> {
+                            LOGGER.info("Adding plan: {}",  declarativePlan.getName());
+
+                            final Plan plan = MappingUtil.map(declarativePlan, Plan.class);
+                            plan.setInitialVersion(plan.getVersion());
+                            plan.setVersion(null);
+                            planClient.create(orgName, plan);
+                        });
+
+                // add policies
+                applyPolicies(planClient, declarativePlan, orgName, declarativePlan.getName(), declarativePlan.getVersion());
+});
+
+        });
+    }
+    
+    /**
+     * Add and configure the Plan if it is not present.
+     *
+     * @param planClient
+     * @param declarativePlan
+     * @param orgName
+     * @param planName
+     * @param planVersion
+     * @return the state of the Plan
+     */
+    private void applyPlanVersion(PlanApi planClient, DeclarativePlan declarativePlan, String orgName,
+                                  String planName, String planVersion) {
+
+        LOGGER.debug("Applying Plan: {}", planName);
+
+        // Plan version
+        of(DeclarativeUtil.checkExists(() -> planClient.fetchVersion(orgName, planName, planVersion)))
+                .ifPresent(existing -> {
+                    LOGGER.info("Plan '{}' version '{}' already exists", planName, planVersion);
+                })
+                .ifNotPresent(() -> {
+                    LOGGER.info("Adding Plan '{}' version '{}'", planName, planVersion);
+
+                    // create version
+                    final PlanVersion planVersionWrapper = new PlanVersion(planVersion);
+                    planClient.createVersion(orgName, planName, planVersionWrapper);
+                });
+    }
+
+    /**
+     * Add policies to the Plan if they are not present.
+     *
+     * @param planClient
+     * @param declarativePlan
+     * @param orgName
+     * @param planName
+     * @param planVersion
+     */
+    private void applyPolicies(PlanApi planClient, DeclarativePlan declarativePlan, String orgName,
+                               String planName, String planVersion) {
+
+        ofNullable(declarativePlan.getPolicies()).ifPresent(declarativePolicies -> {
+            LOGGER.debug("Applying policies to Plan: {}", planName);
+
+            // existing policies for the Plan
+            final List<ApiPolicy> apiPolicies = planClient.fetchPolicies(orgName, planName, planVersion);
+
+            declarativePolicies.forEach(declarativePolicy -> {
+                final String policyName = declarativePolicy.getName();
+
+                final ApiPolicy apiPolicy = new ApiPolicy(
+                        MappingUtil.safeWriteValueAsJson(declarativePolicy.getConfig()));
+
+                // determine if the policy already exists for this Plan
+                final Optional<ApiPolicy> existingPolicy = apiPolicies.stream()
+                        .filter(p -> policyName.equals(p.getPolicyDefinitionId()))
+                        .findFirst();
+
+                if (existingPolicy.isPresent()) {
+                    // update the existing policy config
+                    LOGGER.info("Updating existing policy '{}' configuration for Plan: {}", policyName, planName);
+
+                    final Long policyId = existingPolicy.get().getId();
+                    //planClient.configurePolicy(orgName, planName, planVersion, policyId, apiPolicy);
+                } else {
+                    // add new policy
+                    LOGGER.info("Adding policy '{}' to Plan: {}", policyName, planName);
+
+                    apiPolicy.setDefinitionId(policyName);
+                    planClient.addPolicy(orgName, planName, planVersion, apiPolicy);
+                }
+            });
+        });
+    }
+    
     /**
      * Add and configure the API if it is not present.
      *
