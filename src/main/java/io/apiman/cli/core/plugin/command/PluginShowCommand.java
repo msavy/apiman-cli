@@ -16,12 +16,12 @@
 
 package io.apiman.cli.core.plugin.command;
 
+import com.beust.jcommander.Parameter;
 import io.apiman.cli.core.common.command.ModelShowCommand;
-import io.apiman.cli.exception.CommandException;
 import io.apiman.cli.core.plugin.PluginApi;
 import io.apiman.cli.core.plugin.PluginMixin;
 import io.apiman.cli.core.plugin.model.Plugin;
-import org.kohsuke.args4j.Option;
+import io.apiman.cli.exception.CommandException;
 
 /**
  * Show a plugin.
@@ -31,7 +31,7 @@ import org.kohsuke.args4j.Option;
 public class PluginShowCommand extends ModelShowCommand<Plugin, PluginApi>
         implements PluginMixin {
 
-    @Option(name = "--id", aliases = {"-i"}, usage = "Plugin ID")
+    @Parameter(names = { "--id", "-i"}, description = "Plugin ID")
     private String id;
 
     @Override

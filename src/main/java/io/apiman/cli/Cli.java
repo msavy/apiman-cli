@@ -16,12 +16,12 @@
 
 package io.apiman.cli;
 
+import com.beust.jcommander.JCommander;
+import com.google.common.collect.Lists;
 import io.apiman.cli.command.AbstractCommand;
 import io.apiman.cli.command.Command;
 
 import java.util.Map;
-
-import com.google.common.collect.Lists;
 
 /**
  * The main class; the root of all Commands.
@@ -30,7 +30,11 @@ import com.google.common.collect.Lists;
  */
 public class Cli extends AbstractCommand {
     public static void main(String... args) {
-        new Cli().run(Lists.newArrayList(args));
+        JCommander jc = new JCommander();
+        Cli cli = new Cli();
+        jc.addObject(cli);
+        cli.build(jc);
+        cli.run(Lists.newArrayList(args), jc);
     }
 
     @Override

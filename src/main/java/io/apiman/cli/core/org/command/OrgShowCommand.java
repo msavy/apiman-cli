@@ -16,14 +16,14 @@
 
 package io.apiman.cli.core.org.command;
 
+import com.beust.jcommander.Parameter;
 import io.apiman.cli.core.common.command.ModelShowCommand;
 import io.apiman.cli.core.org.OrgApi;
 import io.apiman.cli.core.org.OrgMixin;
-import io.apiman.cli.exception.CommandException;
 import io.apiman.cli.core.org.model.Org;
+import io.apiman.cli.exception.CommandException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.kohsuke.args4j.Option;
 
 /**
  * Show an organisation.
@@ -33,7 +33,7 @@ import org.kohsuke.args4j.Option;
 public class OrgShowCommand extends ModelShowCommand<Org, OrgApi> implements OrgMixin {
     private static final Logger LOGGER = LogManager.getLogger(OrgShowCommand.class);
 
-    @Option(name = "--name", aliases = {"-n"}, usage = "Name")
+    @Parameter(names = { "--name", "-n"}, description = "Name")
     private String name;
 
     @Override

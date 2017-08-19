@@ -16,12 +16,12 @@
 
 package io.apiman.cli.core.gateway.command;
 
+import com.beust.jcommander.Parameter;
 import io.apiman.cli.core.common.command.ModelShowCommand;
 import io.apiman.cli.core.gateway.GatewayApi;
 import io.apiman.cli.core.gateway.GatewayMixin;
-import io.apiman.cli.exception.CommandException;
 import io.apiman.cli.core.gateway.model.Gateway;
-import org.kohsuke.args4j.Option;
+import io.apiman.cli.exception.CommandException;
 
 /**
  * Show a gateway.
@@ -31,7 +31,7 @@ import org.kohsuke.args4j.Option;
 public class GatewayShowCommand extends ModelShowCommand<Gateway, GatewayApi>
         implements GatewayMixin {
 
-    @Option(name = "--name", aliases = {"-n"}, usage = "Name")
+    @Parameter(names = { "--name", "-n"}, description = "Name")
     private String name;
 
     @Override

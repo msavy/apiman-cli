@@ -16,6 +16,7 @@
 
 package io.apiman.cli.core.gateway.command;
 
+import com.beust.jcommander.JCommander;
 import io.apiman.cli.core.gateway.GatewayApi;
 import io.apiman.cli.core.gateway.model.GatewayTestResponse;
 import io.apiman.cli.exception.CommandException;
@@ -24,8 +25,6 @@ import io.apiman.cli.util.LogUtil;
 import io.apiman.cli.util.MappingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
 
 import java.text.MessageFormat;
 
@@ -43,12 +42,12 @@ public class GatewayTestCommand extends AbstractGatewayCreateCommand {
     }
 
     @Override
-    public void performAction(CmdLineParser parser) throws CommandException {
+    public void performAction(JCommander parser) throws CommandException {
         LOGGER.debug("Testing {}", this::getModelName);
 
         GatewayTestResponse response;
         try {
-            final GatewayApi apiClient = buildServerApiClient(GatewayApi.class);
+            final GatewayApi apiClient = getManagerConfig().buildServerApiClient(GatewayApi.class);
             response = apiClient.test(buildModelInstance());
 
             LogUtil.OUTPUT.info("Test {}", () -> response.isSuccess() ? "successful" : "failed");

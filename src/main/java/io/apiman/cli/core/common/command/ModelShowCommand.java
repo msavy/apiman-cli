@@ -16,12 +16,12 @@
 
 package io.apiman.cli.core.common.command;
 
+import com.beust.jcommander.JCommander;
 import io.apiman.cli.exception.CommandException;
 import io.apiman.cli.util.LogUtil;
 import io.apiman.cli.util.MappingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.kohsuke.args4j.CmdLineParser;
 
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -38,11 +38,11 @@ public abstract class ModelShowCommand<M, A> extends AbstractManagerModelCommand
     }
 
     @Override
-    public void performAction(CmdLineParser parser) throws CommandException {
+    public void performAction(JCommander parser) throws CommandException {
         LOGGER.debug("Showing {}", this::getModelName);
 
         try {
-            final A apiClient = this.buildServerApiClient(getApiClass());
+            final A apiClient = getManagerConfig().buildServerApiClient(getApiClass());
             final Method fetchMethod = apiClient.getClass().getMethod("fetch", String.class);
 
             @SuppressWarnings("unchecked")

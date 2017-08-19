@@ -16,7 +16,7 @@
 
 package io.apiman.cli.command;
 
-import org.kohsuke.args4j.CmdLineParser;
+import com.beust.jcommander.JCommander;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ public abstract class AbstractFinalCommand extends AbstractCommand {
      * @return <code>null</code>
      */
     @Override
-    protected Command getChildAction(List<String> args, CmdLineParser parser) {
+    protected Command getChildAction(List<String> args, JCommander parser) {
         return null;
     }
 

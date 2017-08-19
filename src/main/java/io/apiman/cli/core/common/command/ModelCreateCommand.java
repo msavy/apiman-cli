@@ -16,11 +16,11 @@
 
 package io.apiman.cli.core.common.command;
 
+import com.beust.jcommander.JCommander;
 import io.apiman.cli.exception.CommandException;
 import io.apiman.cli.management.ManagementApiUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.kohsuke.args4j.CmdLineParser;
 import retrofit.client.Response;
 
 import java.lang.reflect.InvocationTargetException;
@@ -39,12 +39,12 @@ public abstract class ModelCreateCommand<M, A> extends AbstractManagerModelComma
     }
 
     @Override
-    public void performAction(CmdLineParser parser) throws CommandException {
+    public void performAction(JCommander parser) throws CommandException {
         LOGGER.debug("Creating {}", this::getModelName);
 
         ManagementApiUtil.invokeAndCheckResponse(() -> {
             try {
-                final A apiClient = buildServerApiClient(getApiClass());
+                final A apiClient = getManagerConfig().buildServerApiClient(getApiClass());
                 final Method createMethod = apiClient.getClass().getMethod("create", getModelClass());
                 return (Response) createMethod.invoke(apiClient, buildModelInstance());
 

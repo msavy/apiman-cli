@@ -16,12 +16,12 @@
 
 package io.apiman.cli.core.api.command;
 
-import io.apiman.cli.core.common.command.AbstractManagerModelCommand;
-import io.apiman.cli.core.api.Version12xServerApi;
+import com.beust.jcommander.Parameter;
 import io.apiman.cli.core.api.ApiMixin;
+import io.apiman.cli.core.api.Version12xServerApi;
 import io.apiman.cli.core.api.model.Api;
+import io.apiman.cli.core.common.command.AbstractManagerModelCommand;
 import io.apiman.cli.core.common.model.ManagementApiVersion;
-import org.kohsuke.args4j.Option;
 
 /**
  * Common API functionality.
@@ -30,9 +30,9 @@ import org.kohsuke.args4j.Option;
  */
 public abstract class AbstractApiCommand extends AbstractManagerModelCommand<Api, Version12xServerApi>
         implements ApiMixin {
-    @Option(name = "--orgName", aliases = {"-o"}, usage = "Organisation name", required = true)
+    @Parameter(names = { "--orgName", "-o"}, description = "Organisation name", required = true)
     protected String orgName;
 
-    @Option(name = "--serverVersion", aliases = {"-sv"}, usage = "Management API server version")
+    @Parameter(names = { "--serverVersion", "-sv"}, description = "Management API server version")
     protected ManagementApiVersion serverVersion = ManagementApiVersion.DEFAULT_VERSION;
 }

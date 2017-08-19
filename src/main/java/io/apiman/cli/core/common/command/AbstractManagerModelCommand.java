@@ -16,13 +16,9 @@
 
 package io.apiman.cli.core.common.command;
 
+import com.beust.jcommander.ParametersDelegate;
 import io.apiman.cli.command.AbstractFinalCommand;
-import io.apiman.cli.core.common.model.ManagementApiVersion;
-import io.apiman.cli.management.ManagementApiUtil;
-import org.kohsuke.args4j.Option;
-
-import static io.apiman.cli.util.AuthUtil.DEFAULT_SERVER_PASSWORD;
-import static io.apiman.cli.util.AuthUtil.DEFAULT_SERVER_USERNAME;
+import io.apiman.cli.command.ManagerCommon;
 
 /**
  * Common model CRUD functionality.
@@ -31,56 +27,10 @@ import static io.apiman.cli.util.AuthUtil.DEFAULT_SERVER_USERNAME;
  */
 public abstract class AbstractManagerModelCommand<M, A> extends AbstractFinalCommand
         implements ModelAction<M, A> {
+    @ParametersDelegate
+    private ManagerCommon managerConfig = new ManagerCommon();
 
-    String DEFAULT_SERVER_ADDRESS = "http://localhost:8080/apiman";
-
-    @Option(name = "--server", aliases = {"-s"}, usage = "Management API server address")
-    private String serverAddress = DEFAULT_SERVER_ADDRESS;
-
-    @Option(name = "--serverUsername", aliases = {"-su"}, usage = "Management API server username")
-    private String serverUsername = DEFAULT_SERVER_USERNAME;
-
-    @Option(name = "--serverPassword", aliases = {"-sp"}, usage = "Management API server password")
-    private String serverPassword = DEFAULT_SERVER_PASSWORD;
-
-    /**
-     * @param clazz the Class for which to build a client
-     * @param <T>   the API interface
-     * @return an API client for the given Class
-     */
-    protected <T> T buildServerApiClient(Class<T> clazz) {
-        return buildServerApiClient(clazz, ManagementApiVersion.UNSPECIFIED);
+    public ManagerCommon getManagerConfig() {
+        return managerConfig;
     }
-
-    /**
-     * @param clazz         the Class for which to build a client
-     * @param serverVersion the server version
-     * @param <T>           the API interface
-     * @return an API client for the given Class
-     */
-    protected <T> T buildServerApiClient(Class<T> clazz, ManagementApiVersion serverVersion) {
-        return ManagementApiUtil.buildServerApiClient(
-                clazz,
-                getManagementApiEndpoint(),
-                getManagementApiUsername(),
-                getManagementApiPassword(),
-                getLogDebug(),
-                serverVersion);
-    }
-
-    protected String getManagementApiEndpoint() {
-        // TODO consider reading from config file/environment
-        return serverAddress;
-    }
-
-    protected String getManagementApiUsername() {
-        // TODO consider reading from config file/environment
-        return serverUsername;
-    }
-
-    protected String getManagementApiPassword() {
-        // TODO consider reading from config file/environment
-        return serverPassword;
-    }
-
 }

@@ -16,26 +16,19 @@
 
 package io.apiman.cli.command;
 
-import static io.apiman.cli.util.LogUtil.LINE_SEPARATOR;
-
-import io.apiman.cli.core.common.model.ManagementApiVersion;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.google.common.collect.Maps;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import io.apiman.cli.exception.CommandException;
-import io.apiman.cli.exception.ExitWithCodeException;
-import io.apiman.cli.management.ManagementApiUtil;
-import io.apiman.cli.util.LogUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
-
-import com.google.common.collect.Maps;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import static io.apiman.cli.util.LogUtil.LINE_SEPARATOR;
 
 /**
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
@@ -48,10 +41,10 @@ public abstract class AbstractCommand implements Command {
      */
     private final Map<String, Class<? extends Command>> commandMap;
 
-    @Option(name = "--debug", usage = "Log at DEBUG level")
+    @Parameter(names = "--debug", description = "Log at DEBUG level")
     private boolean logDebug;
 
-    @Option(name = "--help", aliases = {"-h"}, usage = "Display usage only", help = true)
+    @Parameter(names = {"--help", "-h"}, description = "Display usage only", help = true)
     private boolean displayHelp;
 
     /**
@@ -105,62 +98,89 @@ public abstract class AbstractCommand implements Command {
         return commandName;
     }
 
-    /**
-     * See {@link Command#run(List)}
-     */
+    private static JCommander addSubCommand(JCommander parentCommand,
+                                            String commandName, Object commandObject) {
+        parentCommand.addCommand(commandName, commandObject);
+        return parentCommand.getCommands().get(commandName);
+    }
+
     @Override
-    public void run(List<String> args) {
-        final CmdLineParser parser = new CmdLineParser(this);
+    public void build(JCommander jc) {
+        //jc.addCommand(this);
+        for (Map.Entry<String, Class<? extends Command>> entry : commandMap.entrySet()) {
+            Command childAction = getChildAction(entry.getKey(), jc);
+            System.out.println("entry.getKey(): " + entry.getKey());
+            JCommander sub = addSubCommand(jc, entry.getKey(), childAction);
+            childAction.build(sub);
+        }
+    }
 
-        if (!permitNoArgs() && 0 == args.size()) {
-            printUsage(parser, false);
-            return;
+    @Override
+    public void run(List<String> args, JCommander jc) {
+        jc.parse(args.toArray(new String[]{}));
+
+        if (args.size() == 0 || displayHelp){
+            jc.usage();
+            System.exit(0);
         }
 
-        final Command child = getChildAction(args, parser);
+        System.out.println("Foo! " + args);
 
-        if (null == child) {
-            try {
-                parser.parseArgument(args);
 
-                // update log config based on parsed arguments
-                LogUtil.configureLogging(logDebug);
 
-                if (displayHelp) {
-                    printUsage(parser, true);
-                } else {
-                    performAction(parser);
-                }
+//        //final CmdLineParser parser = new CmdLineParser(this);
+//        final JCommander parser = JCommander.newBuilder()
+//                .addO
 
-            } catch (CmdLineException e) {
-                // handling of wrong arguments
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(e);
-                } else {
-                    LOGGER.error(e.getMessage());
-                }
-
-                printUsage(parser, false);
-
-            } catch (ExitWithCodeException ec) {
-                // print the message and exit with the given code
-                LogUtil.OUTPUT.error(ec.getMessage());
-
-                if (ec.isPrintUsage()) {
-                    printUsage(parser, ec.getExitCode());
-                } else {
-                    System.exit(ec.getExitCode());
-                }
-
-            } catch (Exception e) {
-                LOGGER.error("Error in " + getCommandDescription(), e);
-                System.exit(1);
-            }
-
-        } else {
-            // begin execution
-            child.run(args.subList(1, args.size()));
-        }
+//        if (!permitNoArgs() && 0 == args.size()) {
+//            //printUsage(parser, false);
+//            return;
+//        }
+//
+//        final Command child = getChildAction(args, builder);
+//
+//        if (null == child) {
+//            try {
+//                parser.parseArgument(args);
+//
+//                // update log config based on parsed arguments
+//                LogUtil.configureLogging(logDebug);
+//
+//                if (displayHelp) {
+//                   // printUsage(parser, true);
+//                } else {
+//                    performAction(parser);
+//                }
+//
+//            } catch (CmdLineException e) {
+//                // handling of wrong arguments
+//                if (LOGGER.isDebugEnabled()) {
+//                    LOGGER.debug(e);
+//                } else {
+//                    LOGGER.error(e.getMessage());
+//                }
+//
+//                printUsage(parser, false);
+//
+//            } catch (ExitWithCodeException ec) {
+//                // print the message and exit with the given code
+//                LogUtil.OUTPUT.error(ec.getMessage());
+//
+//                if (ec.isPrintUsage()) {
+//                    printUsage(parser, ec.getExitCode());
+//                } else {
+//                    System.exit(ec.getExitCode());
+//                }
+//
+//            } catch (Exception e) {
+//                LOGGER.error("Error in " + getCommandDescription(), e);
+//                System.exit(1);
+//            }
+//
+//        } else {
+//            // begin execution
+//            child.run(args.subList(1, args.size()));
+//        }
     }
 
     /**
@@ -171,11 +191,11 @@ public abstract class AbstractCommand implements Command {
     }
 
     /**
-     * See {@link Command#performAction(CmdLineParser)}
+     * @param parser
      */
     @Override
-    public void performAction(CmdLineParser parser) throws CommandException {
-        printUsage(parser, false);
+    public void performAction(JCommander parser) throws CommandException {
+//        printUsage(parser, false);
     }
 
     /**
@@ -184,9 +204,9 @@ public abstract class AbstractCommand implements Command {
      * @param parser  the command line parser containing usage information
      * @param success whether this is due to a successful operation
      */
-    private void printUsage(CmdLineParser parser, boolean success) {
-        printUsage(parser, success ? 0 : 255);
-    }
+//    private void printUsage(CmdLineParser parser, boolean success) {
+//        printUsage(parser, success ? 0 : 255);
+//    }
 
     /**
      * Print usage information, then exit.
@@ -194,13 +214,14 @@ public abstract class AbstractCommand implements Command {
      * @param parser   the command line parser containing usage information
      * @param exitCode the exit code
      */
-    private void printUsage(CmdLineParser parser, int exitCode) {
+    private void printUsage(JCommander.Builder parser, int exitCode) {
         System.out.println(getCommandDescription() + " usage:");
 
         // additional usage message
         System.out.println(getAdditionalUsage());
 
-        parser.printUsage(System.out);
+        System.out.println("Print usage...");
+        //parser.printUsage(System.out);
         System.exit(exitCode);
     }
 
@@ -249,7 +270,7 @@ public abstract class AbstractCommand implements Command {
      * @param parser the command line parser containing usage information
      * @return a child Command for the given args, or <code>null</code> if not found
      */
-    protected Command getChildAction(List<String> args, CmdLineParser parser) {
+    protected Command getChildAction(List<String> args, JCommander parser) {
         final String commandName = args.get(0);
 
         // find implementation
@@ -259,7 +280,6 @@ public abstract class AbstractCommand implements Command {
                 final Command command = injector.getInstance(commandClass);
                 command.setParent(this);
                 command.setCommandName(commandName);
-
                 return command;
             } catch (Exception e) {
                 throw new CommandException(String.format("Error getting child command for args: %s", args), e);
@@ -267,6 +287,23 @@ public abstract class AbstractCommand implements Command {
         }
         return null;
     }
+
+    protected Command getChildAction(String commandName, JCommander parser) {
+        // find implementation
+        final Class<? extends Command> commandClass = commandMap.get(commandName);
+        if (null != commandClass) {
+            try {
+                final Command command = injector.getInstance(commandClass);
+                command.setParent(this);
+                command.setCommandName(commandName);
+                return command;
+            } catch (Exception e) {
+                throw new CommandException(String.format("Error getting child command for args: %s", commandName), e);
+            }
+        }
+        return null;
+    }
+
 
     public void setLogDebug(boolean logDebug) {
         this.logDebug = logDebug;

@@ -16,10 +16,11 @@
 
 package io.apiman.cli.core.declarative.command;
 
-import static io.apiman.cli.util.Functions.of;
-import static java.util.Optional.ofNullable;
-
-import io.apiman.cli.command.ManagerMixin;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
+import com.google.common.io.CharStreams;
+import io.apiman.cli.command.ManagerCommon;
 import io.apiman.cli.core.api.VersionAgnosticApi;
 import io.apiman.cli.core.api.model.Api;
 import io.apiman.cli.core.api.model.ApiConfig;
@@ -41,6 +42,10 @@ import io.apiman.cli.exception.DeclarativeException;
 import io.apiman.cli.util.BeanUtil;
 import io.apiman.cli.util.DeclarativeUtil;
 import io.apiman.cli.util.MappingUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import retrofit.mime.TypedString;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,23 +56,21 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.kohsuke.args4j.Option;
+import static io.apiman.cli.util.Functions.of;
+import static java.util.Optional.ofNullable;
 
-import com.google.common.io.CharStreams;
-
-import retrofit.mime.TypedString;
-
-public class ManagerApplyCommand extends AbstractApplyCommand implements ManagerMixin {
+@Parameters(commandDescription = "Apply Apiman Manager declaration")
+public class ManagerApplyCommand extends AbstractApplyCommand {
     private static final String STATE_READY = "READY";
     private static final String STATE_PUBLISHED = "PUBLISHED";
     private static final String STATE_RETIRED = "RETIRED";
     private static final Logger LOGGER = LogManager.getLogger(ManagerApplyCommand.class);
 
-    @Option(name = "--serverVersion", aliases = {"-sv"}, usage = "Management API server version")
+    @Parameter(names = { "--serverVersion", "-sv"}, description = "Management API server version")
     private ManagementApiVersion serverVersion = ManagementApiVersion.DEFAULT_VERSION;
+
+    @ParametersDelegate
+    private ManagerCommon managerCommon = new ManagerCommon();
 
     /**
      * Apply the given Declaration.
@@ -87,7 +90,7 @@ public class ManagerApplyCommand extends AbstractApplyCommand implements Manager
         // add org
         ofNullable(declaration.getOrg()).ifPresent(declarativeOrg -> {
             final String orgName = declaration.getOrg().getName();
-            final OrgApi orgApiClient = buildServerApiClient(OrgApi.class);
+            final OrgApi orgApiClient =  managerCommon.buildServerApiClient(OrgApi.class);
 
             of(DeclarativeUtil.checkExists(() -> orgApiClient.fetch(orgName)))
                     .ifPresent(existing -> {
@@ -115,7 +118,7 @@ public class ManagerApplyCommand extends AbstractApplyCommand implements Manager
             LOGGER.debug("Applying gateways");
 
             gateways.forEach(declarativeGateway -> {
-                final GatewayApi apiClient = buildServerApiClient(GatewayApi.class);
+                final GatewayApi apiClient = managerCommon.buildServerApiClient(GatewayApi.class);
                 final String gatewayName = declarativeGateway.getName();
 
                 of(DeclarativeUtil.checkExists(() -> apiClient.fetch(gatewayName)))
@@ -142,7 +145,7 @@ public class ManagerApplyCommand extends AbstractApplyCommand implements Manager
             LOGGER.debug("Applying plugins");
 
             plugins.forEach(plugin -> {
-                final PluginApi apiClient = buildServerApiClient(PluginApi.class);
+                final PluginApi apiClient = managerCommon.buildServerApiClient(PluginApi.class);
 
                 if (checkPluginExists(plugin, apiClient)) {
                     LOGGER.info("Plugin already installed: {}", plugin.getName());
@@ -184,7 +187,7 @@ public class ManagerApplyCommand extends AbstractApplyCommand implements Manager
             LOGGER.debug("Applying APIs");
 
             declarativeApis.forEach(declarativeApi -> {
-                final VersionAgnosticApi apiClient = buildServerApiClient(VersionAgnosticApi.class, serverVersion);
+                final VersionAgnosticApi apiClient = managerCommon.buildServerApiClient(VersionAgnosticApi.class, serverVersion);
                 final String apiName = declarativeApi.getName();
 
                 // determine the version of the API being configured
@@ -445,7 +448,7 @@ public class ManagerApplyCommand extends AbstractApplyCommand implements Manager
      */
     private void performPublish(String orgName, String apiName, String apiVersion) {
         LOGGER.info("Publishing API: {}", apiName);
-        ServerActionUtil.publishApi(orgName, apiName, apiVersion, serverVersion, buildServerApiClient(ActionApi.class));
+        ServerActionUtil.publishApi(orgName, apiName, apiVersion, serverVersion, managerCommon.buildServerApiClient(ActionApi.class));
     }
 
     public void setServerVersion(ManagementApiVersion serverVersion) {
