@@ -18,10 +18,12 @@ package io.apiman.cli.command;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterDescription;
 import com.google.common.collect.Maps;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.apiman.cli.exception.CommandException;
+import io.apiman.cli.util.LogUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,6 +42,7 @@ public abstract class AbstractCommand implements Command {
      * Maps commands (e.g. 'org' or 'create') to their implementations.
      */
     private final Map<String, Class<? extends Command>> commandMap;
+    private final Map<String, Command> commandInstanceMap;
 
     @Parameter(names = "--debug", description = "Log at DEBUG level")
     private boolean logDebug;
@@ -56,13 +59,17 @@ public abstract class AbstractCommand implements Command {
      * The name of this command.
      */
     private String commandName;
-    private Injector injector;
+    private static Injector injector;
+
+    static {
+        injector = Guice.createInjector();
+    }
 
     public AbstractCommand() {
         // get child commands
         commandMap = Maps.newHashMap();
+        commandInstanceMap = Maps.newHashMap();
         populateCommands(commandMap);
-        injector = Guice.createInjector();
     }
 
     /**
@@ -106,10 +113,9 @@ public abstract class AbstractCommand implements Command {
 
     @Override
     public void build(JCommander jc) {
-        //jc.addCommand(this);
         for (Map.Entry<String, Class<? extends Command>> entry : commandMap.entrySet()) {
             Command childAction = getChildAction(entry.getKey(), jc);
-            System.out.println("entry.getKey(): " + entry.getKey());
+            commandInstanceMap.put(entry.getKey(), childAction);
             JCommander sub = addSubCommand(jc, entry.getKey(), childAction);
             childAction.build(sub);
         }
@@ -117,26 +123,25 @@ public abstract class AbstractCommand implements Command {
 
     @Override
     public void run(List<String> args, JCommander jc) {
-        jc.parse(args.toArray(new String[]{}));
+        LogUtil.configureLogging(logDebug);
+        LOGGER.debug("Command Name: {}. Args: {} ", commandName, args);
 
-        if (args.size() == 0 || displayHelp){
-            jc.usage();
-            System.exit(0);
+        if (displayHelp) {
+            printUsage(jc, true);
         }
 
-        System.out.println("Foo! " + args);
+        Command childInstance = commandInstanceMap.get(jc.getParsedCommand());
+        // If end of chain
+        if (childInstance == null) {
+            if (!permitNoArgs() && noArgsSet(jc)) {
+                printUsage(jc, false);
+            }
+            performAction(jc);
+        } else {
+            JCommander subCommand = jc.getCommands().get(jc.getParsedCommand());
+            childInstance.run(args, subCommand);
+        }
 
-
-
-//        //final CmdLineParser parser = new CmdLineParser(this);
-//        final JCommander parser = JCommander.newBuilder()
-//                .addO
-
-//        if (!permitNoArgs() && 0 == args.size()) {
-//            //printUsage(parser, false);
-//            return;
-//        }
-//
 //        final Command child = getChildAction(args, builder);
 //
 //        if (null == child) {
@@ -183,6 +188,10 @@ public abstract class AbstractCommand implements Command {
 //        }
     }
 
+    private boolean noArgsSet(JCommander jc) {
+        return !jc.getParameters().stream().allMatch(ParameterDescription::isAssigned);
+    }
+
     /**
      * @return <code>true</code> if the Command is permitted to accept no arguments, otherwise <code>false</code>
      */
@@ -195,18 +204,18 @@ public abstract class AbstractCommand implements Command {
      */
     @Override
     public void performAction(JCommander parser) throws CommandException {
-//        printUsage(parser, false);
+        printUsage(parser, false);
     }
 
     /**
      * Print usage information, then exit.
      *
-     * @param parser  the command line parser containing usage information
+     * @param jc  the command line parser containing usage information
      * @param success whether this is due to a successful operation
      */
-//    private void printUsage(CmdLineParser parser, boolean success) {
-//        printUsage(parser, success ? 0 : 255);
-//    }
+    private void printUsage(JCommander jc, boolean success) {
+        printUsage(jc, success ? 0 : 255);
+    }
 
     /**
      * Print usage information, then exit.
@@ -214,14 +223,13 @@ public abstract class AbstractCommand implements Command {
      * @param parser   the command line parser containing usage information
      * @param exitCode the exit code
      */
-    private void printUsage(JCommander.Builder parser, int exitCode) {
+    private void printUsage(JCommander parser, int exitCode) {
         System.out.println(getCommandDescription() + " usage:");
 
         // additional usage message
         System.out.println(getAdditionalUsage());
 
-        System.out.println("Print usage...");
-        //parser.printUsage(System.out);
+        parser.usage();
         System.exit(exitCode);
     }
 

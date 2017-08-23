@@ -17,9 +17,12 @@
 package io.apiman.cli;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import com.google.common.collect.Lists;
 import io.apiman.cli.command.AbstractCommand;
 import io.apiman.cli.command.Command;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
@@ -29,11 +32,24 @@ import java.util.Map;
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
 public class Cli extends AbstractCommand {
+    private static final Logger LOGGER = LogManager.getLogger(Cli.class);
+
     public static void main(String... args) {
         JCommander jc = new JCommander();
         Cli cli = new Cli();
         jc.addObject(cli);
         cli.build(jc);
+        try {
+            jc.parse(args);
+        } catch (ParameterException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e);
+            } else {
+                LOGGER.error(e.getMessage());
+            }
+            e.printStackTrace();
+            e.usage();
+        }
         cli.run(Lists.newArrayList(args), jc);
     }
 
