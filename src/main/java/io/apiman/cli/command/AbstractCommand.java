@@ -19,6 +19,7 @@ package io.apiman.cli.command;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterDescription;
+import com.beust.jcommander.ParameterException;
 import com.google.common.collect.Maps;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -27,8 +28,10 @@ import io.apiman.cli.util.LogUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.apiman.cli.util.LogUtil.LINE_SEPARATOR;
 
@@ -49,6 +52,9 @@ public abstract class AbstractCommand implements Command {
 
     @Parameter(names = {"--help", "-h"}, description = "Display usage only", help = true)
     private boolean displayHelp;
+
+    @Parameter(hidden=true)
+    public List<String> mainParameter = new ArrayList<>(); // blah
 
     /**
      * The parent Command (<code>null</code> if root).
@@ -128,6 +134,13 @@ public abstract class AbstractCommand implements Command {
 
         if (displayHelp) {
             printUsage(jc, true);
+        }
+
+        if (!mainParameter.isEmpty()) {
+            ParameterException ex = new ParameterException("Unrecognised option(s): " +
+                    mainParameter.stream().collect(Collectors.joining(", ")));
+            ex.setJCommander(jc);
+            throw ex;
         }
 
         Command childInstance = commandInstanceMap.get(jc.getParsedCommand());
@@ -213,7 +226,7 @@ public abstract class AbstractCommand implements Command {
      * @param jc  the command line parser containing usage information
      * @param success whether this is due to a successful operation
      */
-    private void printUsage(JCommander jc, boolean success) {
+    protected void printUsage(JCommander jc, boolean success) {
         printUsage(jc, success ? 0 : 255);
     }
 
@@ -223,7 +236,7 @@ public abstract class AbstractCommand implements Command {
      * @param parser   the command line parser containing usage information
      * @param exitCode the exit code
      */
-    private void printUsage(JCommander parser, int exitCode) {
+    protected void printUsage(JCommander parser, int exitCode) {
         System.out.println(getCommandDescription() + " usage:");
 
         // additional usage message
