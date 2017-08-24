@@ -17,6 +17,7 @@
 package io.apiman.cli.core.org.command;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import io.apiman.cli.core.common.command.ModelShowCommand;
 import io.apiman.cli.core.org.OrgApi;
 import io.apiman.cli.core.org.OrgMixin;
@@ -30,6 +31,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandDescription = "Show organisation")
 public class OrgShowCommand extends ModelShowCommand<Org, OrgApi> implements OrgMixin {
     private static final Logger LOGGER = LogManager.getLogger(OrgShowCommand.class);
 

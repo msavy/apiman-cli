@@ -17,6 +17,7 @@
 package io.apiman.cli.core.gateway.command;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import io.apiman.cli.core.common.command.ModelShowCommand;
 import io.apiman.cli.core.gateway.GatewayApi;
 import io.apiman.cli.core.gateway.GatewayMixin;
@@ -28,6 +29,7 @@ import io.apiman.cli.exception.CommandException;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandDescription = "Show a gateway")
 public class GatewayShowCommand extends ModelShowCommand<Gateway, GatewayApi>
         implements GatewayMixin {
 

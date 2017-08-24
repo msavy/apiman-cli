@@ -18,6 +18,7 @@ package io.apiman.cli.core.api.command;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import io.apiman.cli.core.api.ApiMixin;
 import io.apiman.cli.core.common.ActionApi;
 import io.apiman.cli.core.common.util.ServerActionUtil;
@@ -32,6 +33,7 @@ import java.text.MessageFormat;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandNames = "Publish API")
 public class ApiPublishCommand extends AbstractApiCommand implements ApiMixin {
     private static final Logger LOGGER = LogManager.getLogger(ApiPublishCommand.class);
 

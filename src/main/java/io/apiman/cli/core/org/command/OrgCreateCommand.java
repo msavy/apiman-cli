@@ -17,6 +17,7 @@
 package io.apiman.cli.core.org.command;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import io.apiman.cli.core.common.command.ModelCreateCommand;
 import io.apiman.cli.core.org.OrgApi;
 import io.apiman.cli.core.org.OrgMixin;
@@ -28,6 +29,7 @@ import io.apiman.cli.exception.CommandException;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandDescription = "Create organisation")
 public class OrgCreateCommand extends ModelCreateCommand<Org, OrgApi>
         implements OrgMixin {
 

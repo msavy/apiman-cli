@@ -18,6 +18,7 @@ package io.apiman.cli.core.api.command;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import com.google.common.io.CharStreams;
 import io.apiman.cli.core.api.ApiMixin;
 import io.apiman.cli.core.api.VersionAgnosticApi;
@@ -40,6 +41,7 @@ import java.text.MessageFormat;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandNames = "Add policy to API")
 public class ApiPolicyAddCommand extends AbstractApiCommand implements ApiMixin {
     private static final Logger LOGGER = LogManager.getLogger(ApiPolicyAddCommand.class);
 

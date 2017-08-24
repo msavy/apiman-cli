@@ -16,6 +16,7 @@
 
 package io.apiman.cli.core.declarative.command;
 
+import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.inject.Inject;
 import io.apiman.cli.command.GatewayCommon;
@@ -64,6 +65,7 @@ import static java.util.Optional.ofNullable;
  *
  * @author Marc Savy {@literal <marc@rhymewithgravy.com>}
  */
+@Parameters(commandDescription = "Apply Apiman Gateway declaration")
 public class GatewayApplyCommand extends AbstractApplyCommand {
     @ParametersDelegate
     private GatewayCommon gatewayCommon = new GatewayCommon();

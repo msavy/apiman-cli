@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
 
-@Parameters(commandDescription = "Commands to interact with the Apiman Manager")
+@Parameters(commandDescription = "Interact with the Apiman Manager")
 public class ManagerCli extends AbstractCommand {
 
     @Override

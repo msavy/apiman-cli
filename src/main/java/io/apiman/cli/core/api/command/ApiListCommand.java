@@ -17,6 +17,7 @@
 package io.apiman.cli.core.api.command;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameters;
 import io.apiman.cli.core.api.ApiMixin;
 import io.apiman.cli.core.api.VersionAgnosticApi;
 import io.apiman.cli.core.api.model.Api;
@@ -34,6 +35,7 @@ import java.util.List;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandNames = "List APIs")
 public class ApiListCommand extends AbstractApiCommand implements ApiMixin {
     private static final Logger LOGGER = LogManager.getLogger(ApiListCommand.class);
 

@@ -17,6 +17,7 @@
 package io.apiman.cli.core.gateway.command;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameters;
 import io.apiman.cli.core.gateway.GatewayApi;
 import io.apiman.cli.core.gateway.model.GatewayTestResponse;
 import io.apiman.cli.exception.CommandException;
@@ -33,6 +34,7 @@ import java.text.MessageFormat;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandDescription = "Test a gateway")
 public class GatewayTestCommand extends AbstractGatewayCreateCommand {
     private static final Logger LOGGER = LogManager.getLogger(GatewayTestCommand.class);
 

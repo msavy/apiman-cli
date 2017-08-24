@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-@Parameters(commandDescription = "Commands to interact with an Apiman Gateway directly")
+@Parameters(commandDescription = "Interact with an Apiman Gateway directly")
 public class GatewayCli extends AbstractCommand {
 
     @Override
