@@ -53,7 +53,7 @@ public class Cli extends AbstractCommand {
             } else {
                 LOGGER.error(e.getMessage());
             }
-            buildUsage(jc, new StringBuilder());
+            printUsage(jc, new StringBuilder());
         } catch (ExitWithCodeException ec) {
             // print the message and exit with the given code
             LogUtil.OUTPUT.error(ec.getMessage());
@@ -83,7 +83,7 @@ public class Cli extends AbstractCommand {
         return chain;
     }
 
-    private void buildUsage(JCommander parent, StringBuilder sb) {
+    private void printUsage(JCommander parent, StringBuilder sb) {
         JCommander jc = getCommand(parent);
         String intermediary = "Usage: " + getCommandChain(parent);
         // Handle arguments
@@ -92,6 +92,7 @@ public class Cli extends AbstractCommand {
             int mandatory = -Boolean.compare(e1.getParameter().required(), e2.getParameter().required());
             return mandatory != 0 ? mandatory : e1.getLongestName().compareTo(e2.getLongestName());
         });
+
         // Build parameter list
         for (ParameterDescription param : parameters) {
             // Optional open braces
@@ -99,13 +100,7 @@ public class Cli extends AbstractCommand {
                 intermediary += "[";
             }
 
-            for (String name : param.getParameter().names()) {
-                intermediary += " " + name;
-
-                if (!(param.getDefault() instanceof Boolean)) {
-                    intermediary += " <value>";
-                }
-            }
+            intermediary += param.getNames();
 
             // Optional close braces
             if (!param.getParameter().required()) {
@@ -114,10 +109,12 @@ public class Cli extends AbstractCommand {
 
             intermediary += " ";
         }
+
         // Doing it this way in case we decide to have width limits.
         if (intermediary.length() > 0) {
             sb.append(intermediary);
         }
+
         // Handle sub-commands
         if (!jc.getCommands().isEmpty()) {
             sb.append("<command> [<args>]\n\n");
@@ -130,6 +127,7 @@ public class Cli extends AbstractCommand {
                 sb.append("\n");
             });
         }
+
         // Handle arguments
         if (!jc.getParameters().isEmpty()) {
             sb.append("\n\nThe following arguments are available:\n\n");
@@ -149,6 +147,8 @@ public class Cli extends AbstractCommand {
                 sb.append("\n");
             });
         }
+
+        // Print to console
         System.out.println(sb.toString());
     }
 
