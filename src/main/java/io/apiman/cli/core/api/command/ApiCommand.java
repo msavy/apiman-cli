@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-@Parameters(commandNames = "Manage APIs")
+@Parameters(commandDescription = "Manage APIs")
 public class ApiCommand extends AbstractCommand {
     @Override
     protected void populateCommands(Map<String, Class<? extends Command>> commandMap) {

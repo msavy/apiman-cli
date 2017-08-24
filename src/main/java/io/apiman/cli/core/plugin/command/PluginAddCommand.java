@@ -17,6 +17,7 @@
 package io.apiman.cli.core.plugin.command;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import io.apiman.cli.core.common.command.ModelCreateCommand;
 import io.apiman.cli.core.plugin.PluginApi;
 import io.apiman.cli.core.plugin.PluginMixin;
@@ -30,6 +31,7 @@ import java.text.MessageFormat;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandDescription = "Add a plugin")
 public class PluginAddCommand extends ModelCreateCommand<Plugin, PluginApi>
         implements PluginMixin {
 

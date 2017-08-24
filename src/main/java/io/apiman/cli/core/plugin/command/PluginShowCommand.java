@@ -17,6 +17,7 @@
 package io.apiman.cli.core.plugin.command;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import io.apiman.cli.core.common.command.ModelShowCommand;
 import io.apiman.cli.core.plugin.PluginApi;
 import io.apiman.cli.core.plugin.PluginMixin;
@@ -28,6 +29,7 @@ import io.apiman.cli.exception.CommandException;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandDescription = "Show a plugin")
 public class PluginShowCommand extends ModelShowCommand<Plugin, PluginApi>
         implements PluginMixin {
 

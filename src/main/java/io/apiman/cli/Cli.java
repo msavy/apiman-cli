@@ -19,6 +19,7 @@ package io.apiman.cli;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.Parameters;
 import com.google.common.collect.Lists;
 import io.apiman.cli.command.AbstractCommand;
 import io.apiman.cli.command.Command;
@@ -35,6 +36,7 @@ import java.util.Map;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
+@Parameters(commandDescription = "Apiman CLI")
 public class Cli extends AbstractCommand {
     private static final Logger LOGGER = LogManager.getLogger(Cli.class);
 
@@ -45,7 +47,7 @@ public class Cli extends AbstractCommand {
         jc.addObject(this);
         build(jc);
         try {
-            jc.parse(args.toArray(new String[]{})); // Hmm
+            jc.parse(args.toArray(new String[]{}));
             super.run(args, jc);
         } catch (ParameterException e) {
             if (LOGGER.isDebugEnabled()) {
