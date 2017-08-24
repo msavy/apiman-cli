@@ -71,6 +71,7 @@ public class ManagerApplyCommand extends AbstractApplyCommand {
 
     @ParametersDelegate
     private ManagerCommon managerCommon = new ManagerCommon();
+    private String serverAddress;
 
     /**
      * Apply the given Declaration.
@@ -453,5 +454,9 @@ public class ManagerApplyCommand extends AbstractApplyCommand {
 
     public void setServerVersion(ManagementApiVersion serverVersion) {
         this.serverVersion = serverVersion;
+    }
+
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
     }
 }

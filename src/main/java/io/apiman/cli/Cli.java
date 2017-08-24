@@ -17,7 +17,6 @@
 package io.apiman.cli;
 
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.google.common.collect.Lists;
@@ -65,93 +64,6 @@ public class Cli extends AbstractCommand {
                 System.exit(ec.getExitCode());
             }
         }
-    }
-
-    private JCommander getCommand(JCommander in) {
-        JCommander jc = in;
-        while (jc.getParsedCommand() != null) {
-            jc = jc.getCommands().get(jc.getParsedCommand());
-        }
-        return jc;
-    }
-
-    private String getCommandChain(JCommander in) {
-        String chain = in.getProgramName() + " ";
-        JCommander jc = in;
-        while (jc.getParsedCommand() != null) {
-            chain += jc.getParsedCommand() + " ";
-            jc = jc.getCommands().get(jc.getParsedCommand());
-        }
-        return chain;
-    }
-
-    private void printUsage(JCommander parent, StringBuilder sb) {
-        JCommander jc = getCommand(parent);
-        String intermediary = "Usage: " + getCommandChain(parent);
-        // Handle arguments
-        List<ParameterDescription> parameters = jc.getParameters();
-        parameters.sort((e1, e2) -> {
-            int mandatory = -Boolean.compare(e1.getParameter().required(), e2.getParameter().required());
-            return mandatory != 0 ? mandatory : e1.getLongestName().compareTo(e2.getLongestName());
-        });
-
-        // Build parameter list
-        for (ParameterDescription param : parameters) {
-            // Optional open braces
-            if (!param.getParameter().required()) {
-                intermediary += "[";
-            }
-
-            intermediary += param.getNames();
-
-            // Optional close braces
-            if (!param.getParameter().required()) {
-                intermediary += "]";
-            }
-
-            intermediary += " ";
-        }
-
-        // Doing it this way in case we decide to have width limits.
-        if (intermediary.length() > 0) {
-            sb.append(intermediary);
-        }
-
-        // Handle sub-commands
-        if (!jc.getCommands().isEmpty()) {
-            sb.append("<command> [<args>]\n\n");
-            sb.append("The following commands are available:\n\n");
-
-            jc.getCommands().forEach((key, value) -> {
-                sb.append("   ");
-                sb.append(key).append(": ");
-                sb.append(jc.getCommandDescription(key));
-                sb.append("\n");
-            });
-        }
-
-        // Handle arguments
-        if (!jc.getParameters().isEmpty()) {
-            sb.append("\n\nThe following arguments are available:\n\n");
-
-            jc.getParameters().forEach(param -> {
-                // Foo: Description
-                sb.append("   ");
-                sb.append(param.getNames() + ": ");
-                sb.append(param.getDescription());
-                // If there is a default set and it's not a boolean
-                if (param.getDefault() != null &&
-                        !(param.getDefault() instanceof Boolean)) {
-                    sb.append(" [default: ");
-                    sb.append(param.getDefault());
-                    sb.append("]");
-                }
-                sb.append("\n");
-            });
-        }
-
-        // Print to console
-        System.out.println(sb.toString());
     }
 
     public static void main(String... args) {

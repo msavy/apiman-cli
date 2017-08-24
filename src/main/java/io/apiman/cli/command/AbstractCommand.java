@@ -154,51 +154,6 @@ public abstract class AbstractCommand implements Command {
             JCommander subCommand = jc.getCommands().get(jc.getParsedCommand());
             childInstance.run(args, subCommand);
         }
-
-//        final Command child = getChildAction(args, builder);
-//
-//        if (null == child) {
-//            try {
-//                parser.parseArgument(args);
-//
-//                // update log config based on parsed arguments
-//                LogUtil.configureLogging(logDebug);
-//
-//                if (displayHelp) {
-//                   // printUsage(parser, true);
-//                } else {
-//                    performAction(parser);
-//                }
-//
-//            } catch (CmdLineException e) {
-//                // handling of wrong arguments
-//                if (LOGGER.isDebugEnabled()) {
-//                    LOGGER.debug(e);
-//                } else {
-//                    LOGGER.error(e.getMessage());
-//                }
-//
-//                printUsage(parser, false);
-//
-//            } catch (ExitWithCodeException ec) {
-//                // print the message and exit with the given code
-//                LogUtil.OUTPUT.error(ec.getMessage());
-//
-//                if (ec.isPrintUsage()) {
-//                    printUsage(parser, ec.getExitCode());
-//                } else {
-//                    System.exit(ec.getExitCode());
-//                }
-//
-//            } catch (Exception e) {
-//                LOGGER.error("Error in " + getCommandDescription(), e);
-//                System.exit(1);
-//            }
-//
-//        } else {
-//            // begin execution
-//            child.run(args.subList(1, args.size()));
-//        }
     }
 
     private boolean noArgsSet(JCommander jc) {
@@ -287,28 +242,10 @@ public abstract class AbstractCommand implements Command {
     }
 
     /**
-     * @param args   the arguments
+     * @param commandName   the
      * @param parser the command line parser containing usage information
      * @return a child Command for the given args, or <code>null</code> if not found
      */
-    protected Command getChildAction(List<String> args, JCommander parser) {
-        final String commandName = args.get(0);
-
-        // find implementation
-        final Class<? extends Command> commandClass = commandMap.get(commandName);
-        if (null != commandClass) {
-            try {
-                final Command command = injector.getInstance(commandClass);
-                command.setParent(this);
-                command.setCommandName(commandName);
-                return command;
-            } catch (Exception e) {
-                throw new CommandException(String.format("Error getting child command for args: %s", args), e);
-            }
-        }
-        return null;
-    }
-
     protected Command getChildAction(String commandName, JCommander parser) {
         // find implementation
         final Class<? extends Command> commandClass = commandMap.get(commandName);
@@ -323,6 +260,93 @@ public abstract class AbstractCommand implements Command {
             }
         }
         return null;
+    }
+
+    private JCommander getCommand(JCommander in) {
+        JCommander jc = in;
+        while (jc.getParsedCommand() != null) {
+            jc = jc.getCommands().get(jc.getParsedCommand());
+        }
+        return jc;
+    }
+
+    private String getCommandChain(JCommander in) {
+        String chain = in.getProgramName() + " ";
+        JCommander jc = in;
+        while (jc.getParsedCommand() != null) {
+            chain += jc.getParsedCommand() + " ";
+            jc = jc.getCommands().get(jc.getParsedCommand());
+        }
+        return chain;
+    }
+
+    protected void printUsage(JCommander parent, StringBuilder sb) {
+        JCommander jc = getCommand(parent);
+        StringBuilder intermediary = new StringBuilder("Usage: " + getCommandChain(parent));
+        // Handle arguments
+        List<ParameterDescription> parameters = jc.getParameters();
+        parameters.sort((e1, e2) -> {
+            int mandatory = -Boolean.compare(e1.getParameter().required(), e2.getParameter().required());
+            return mandatory != 0 ? mandatory : e1.getLongestName().compareTo(e2.getLongestName());
+        });
+
+        // Build parameter list
+        for (ParameterDescription param : parameters) {
+            // Optional open braces
+            if (!param.getParameter().required()) {
+                intermediary.append("[");
+            }
+
+            intermediary.append(param.getNames());
+
+            // Optional close braces
+            if (!param.getParameter().required()) {
+                intermediary.append("]");
+            }
+
+            intermediary.append(" ");
+        }
+
+        // Doing it this way in case we decide to have width limits.
+        if (intermediary.length() > 0) {
+            sb.append(intermediary);
+        }
+
+        // Handle sub-commands
+        if (!jc.getCommands().isEmpty()) {
+            sb.append("<command> [<args>]\n\n");
+            sb.append("The following commands are available:\n\n");
+
+            jc.getCommands().forEach((key, value) -> {
+                sb.append("   ");
+                sb.append(key).append(": ");
+                sb.append(jc.getCommandDescription(key));
+                sb.append("\n");
+            });
+        }
+
+        // Handle arguments
+        if (!jc.getParameters().isEmpty()) {
+            sb.append("\n\nThe following arguments are available:\n\n");
+
+            jc.getParameters().forEach(param -> {
+                // Foo: Description
+                sb.append("   ");
+                sb.append(param.getNames() + ": ");
+                sb.append(param.getDescription());
+                // If there is a default set and it's not a boolean
+                if (param.getDefault() != null &&
+                        !(param.getDefault() instanceof Boolean)) {
+                    sb.append(" [default: ");
+                    sb.append(param.getDefault());
+                    sb.append("]");
+                }
+                sb.append("\n");
+            });
+        }
+
+        // Print to console
+        System.out.println(sb.toString());
     }
 
 

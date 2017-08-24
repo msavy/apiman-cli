@@ -35,8 +35,7 @@ public abstract class AbstractFinalCommand extends AbstractCommand {
      * @param parser
      * @return <code>null</code>
      */
-    @Override
-    protected Command getChildAction(List<String> args, JCommander parser) {
+    protected Command getChildAction(String commandName, JCommander parser) {
         return null;
     }
 
