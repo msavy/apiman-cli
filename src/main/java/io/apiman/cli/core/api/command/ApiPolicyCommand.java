@@ -27,15 +27,11 @@ import java.util.Map;
  *
  * @author Pete Cornish {@literal <outofcoffee@gmail.com>}
  */
-@Parameters(commandNames = "Manage policies")
+@Parameters(commandNames = "Manage API policies")
 public class ApiPolicyCommand extends AbstractCommand {
     @Override
     protected void populateCommands(Map<String, Class<? extends Command>> commandMap) {
         commandMap.put("add", ApiPolicyAddCommand.class);
     }
 
-    @Override
-    protected String getCommandDescription() {
-        return "Manage API policies";
-    }
 }
